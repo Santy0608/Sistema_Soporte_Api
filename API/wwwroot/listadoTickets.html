@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>TSistema Soporte</title>
+</head>
+<body>
+    <h1>Tickets</h1>
+    <ul id="lista"></ul>
+    <script>
+        fetch('/api/Tickets') 
+            .then(response => response.json())
+            .then(data => {
+                const lista = document.getElementById('lista');
+                data.forEach(ticket => {
+                    const li = document.createElement('li');
+                    li.textContent = `${ticket.codigo || ticket.Codigo} - ${ticket.titulo || ticket.Titulo} (${ticket.estado || ticket.Estado})`;
+                    lista.appendChild(li);
+                });
+            })
+            .catch(error => console.error('Error al cargar los tickets:', error));
+    </script>
+</body>
+</html>
