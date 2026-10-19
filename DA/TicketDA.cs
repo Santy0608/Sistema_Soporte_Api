@@ -9,26 +9,23 @@ namespace DA
     public class TicketDA : ITicketDa
     {
 
-        private readonly List<Ticket> tickets = new List<Ticket>();
-
-        public TicketDA()
+        private static List<Ticket> tickets = new List<Ticket>()
         {
-            tickets.Add(new Ticket
+            new Ticket
             {
                 Id = 1,
                 Codigo = "TK-2026-0001",
                 Titulo = "Error en el inicio de sesión",
                 Descripcion = "Los usuarios reportan que no pueden iniciar sesión con sus credenciales.",
-                Prioridad = PrioridadTicket.Critica, 
+                Prioridad = PrioridadTicket.Critica,
                 Estado = EstadoTicket.Abierto,
                 ClienteId = 101,
                 AgenteId = null,
                 Reaperturas = 0,
                 FechaCreacion = DateTime.Now.AddDays(-2),
                 FechaActualizacion = DateTime.Now.AddDays(-2)
-            });
-
-            tickets.Add(new Ticket
+            },
+            new Ticket
             {
                 Id = 2,
                 Codigo = "TK-2026-0002",
@@ -41,9 +38,8 @@ namespace DA
                 Reaperturas = 0,
                 FechaCreacion = DateTime.Now.AddDays(-1),
                 FechaActualizacion = DateTime.Now.AddHours(-4)
-            });
-
-            tickets.Add(new Ticket
+            },
+            new Ticket
             {
                 Id = 3,
                 Codigo = "TK-2026-0003",
@@ -56,7 +52,12 @@ namespace DA
                 Reaperturas = 1,
                 FechaCreacion = DateTime.Now.AddDays(-5),
                 FechaActualizacion = DateTime.Now.AddDays(-1)
-            });
+            }
+        };
+
+        public TicketDA()
+        {
+          
         }
 
         public Ticket ActualizarEstado(int id, EstadoTicket nuevoEstado, int? nuevoAgenteId, PrioridadTicket? nuevaPrioridad)

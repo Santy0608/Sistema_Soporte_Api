@@ -10,9 +10,9 @@ namespace Flujo
     public class TicketFlujo : ITicketFlujo
     {
 
-        public readonly TicketDA _ticketDa;
+        public readonly ITicketDa _ticketDa;
 
-        public TicketFlujo(TicketDA ticketDa)
+        public TicketFlujo(ITicketDa ticketDa)
         {
             _ticketDa = ticketDa ?? throw new ArgumentNullException(nameof(ticketDa));
         }

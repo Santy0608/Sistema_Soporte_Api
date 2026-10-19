@@ -17,10 +17,19 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+var defaultFilesOptions = new DefaultFilesOptions();
+defaultFilesOptions.DefaultFileNames.Clear();
+defaultFilesOptions.DefaultFileNames.Add("listadoTickets.html"); // El nuevo archivo por defecto
+
+
 
 //Inyeccion de dependencias
 builder.Services.AddScoped<IClienteDA, ClienteDA>();
 builder.Services.AddScoped<IClienteFlujo, ClienteFlujo>();
+
+
+builder.Services.AddScoped<ITicketFlujo, TicketFlujo>();
+builder.Services.AddScoped<ITicketDa, TicketDA>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -42,6 +51,13 @@ builder.Services.AddRouting(options =>
 {
     options.ConstraintMap.Add("ticketcode", typeof(TicketCodeRouteConstraint));
 });
+
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
+
 
 var app = builder.Build();
 
@@ -109,7 +125,7 @@ app.MapPost("/min/tickets/{id:int}/reabrir", (int id, [FromServices] ITicketDa t
 
 
 //Caché Condicional
-app.MapGet("/api/tickets/{id:int}", (int id, ITicketDa ticketDA, HttpContext httpContext) =>
+app.MapGet("/api/tickets/{id:int}", (int id, [FromServices] ITicketDa ticketDA, HttpContext httpContext) =>
 {
     var ticket = ticketDA.ObtenerPorId(id);
 
@@ -134,11 +150,6 @@ app.MapGet("/api/tickets/{id:int}", (int id, ITicketDa ticketDA, HttpContext htt
     return Results.Ok(ticket);
 });
 
-builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
-{
-    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-});
-
 //app.MapGet("/min/clientes/buscar", (string? nombre, int pagina, IClienteFlujo flujo) =>
 //{
 //    var clientes = flujo.Obtener().AsEnumerable();
@@ -157,10 +168,12 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 
 
 //nos permite que "/" sirva wwwroot/index.html sin escribir el nombre del archivo
-app.UseDefaultFiles();
+//app.UseDefaultFiles();
+app.UseDefaultFiles(defaultFilesOptions);
 
 //Habilita brindar (servir) al servir los archivos que viven en wwwrroot (WebRoot)
 app.UseStaticFiles();
+
 
 app.UseAuthorization();
 

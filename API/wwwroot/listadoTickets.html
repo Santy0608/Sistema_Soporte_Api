@@ -2,19 +2,33 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>TSistema Soporte</title>
+    <title>Sistema Soporte</title>
 </head>
 <body>
-    <h1>Tickets</h1>
+    <h1>Listado de Tickets</h1>
     <ul id="lista"></ul>
+
     <script>
-        fetch('/api/Tickets') 
-            .then(response => response.json())
+        fetch('/api/tickets')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al obtener los tickets');
+                }
+                return response.json();
+            })
             .then(data => {
                 const lista = document.getElementById('lista');
+                lista.innerHTML = ''; // Limpiar lista previa
+
                 data.forEach(ticket => {
                     const li = document.createElement('li');
-                    li.textContent = `${ticket.codigo || ticket.Codigo} - ${ticket.titulo || ticket.Titulo} (${ticket.estado || ticket.Estado})`;
+
+                    // Manejo seguro de propiedades (camelCase o PascalCase)
+                    const codigo = ticket.codigo || ticket.Codigo || 'S/C';
+                    const titulo = ticket.titulo || ticket.Titulo || 'Sin título';
+                    const estado = ticket.estado || ticket.Estado || 'Desconocido';
+
+                    li.textContent = `${codigo} - ${titulo} (${estado})`;
                     lista.appendChild(li);
                 });
             })

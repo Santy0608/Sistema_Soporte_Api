@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Flujo
 {
-    public class TicketCodeRouteConstraint
+    public class TicketCodeRouteConstraint: IRouteConstraint
     {
             
         private static readonly Regex _regex = new Regex(@"^TK-\d{4}-\d{4}$", RegexOptions.Compiled);

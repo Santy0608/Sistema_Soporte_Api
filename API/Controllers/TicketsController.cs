@@ -27,20 +27,20 @@ namespace API.Controllers
             [FromQuery] string orden = "-fecha",
             [FromQuery] int pagina = 1,
             [FromQuery] int tamano = 10)
-                {
-                    var (items, totalCount) = _ticketFlujo.ListarPaginado(
-                        estado, prioridad, clienteId, desde, hasta, q, orden, pagina, tamano
-                    );
+        {
+            var (items, totalCount) = _ticketFlujo.ListarPaginado(
+                estado, prioridad, clienteId, desde, hasta, q, orden, pagina, tamano
+            );
 
-                    int tamanoEfectivo = Math.Min(tamano > 0 ? tamano : 10, 20);
+            // Ajustar el tamaño efectivo respetando el tope de 20 de la Variante 0
+            int tamanoEfectivo = Math.Min(tamano > 0 ? tamano : 10, 20);
 
-                    Response.Headers.Append("X-Total-Count", totalCount.ToString());
-                    Response.Headers.Append("X-Page", pagina.ToString());
-                    Response.Headers.Append("X-Page-Size", tamanoEfectivo.ToString());
+            Response.Headers.Append("X-Total-Count", totalCount.ToString());
+            Response.Headers.Append("X-Page", pagina.ToString());
+            Response.Headers.Append("X-Page-Size", tamanoEfectivo.ToString());
+            Response.Headers.Append("Access-Control-Expose-Headers", "X-Total-Count, X-Page, X-Page-Size");
 
-                    Response.Headers.Append("Access-Control-Expose-Headers", "X-Total-Count, X-Page, X-Page-Size");
-
-                    return Ok(items);
+            return Ok(items);
         }
 
         [HttpGet("{id}")]
