@@ -39,12 +39,38 @@ El proyecto está estructurado en tres capas principales para separar responsabi
 ## 📋 Endpoints Principales
 
 ### 1. Listar Tickets (Paginado y Filtrado)
-* **GET** `/api/tickets`
-* **Parámetros opcionales (Query)**: `estado`, `prioridad`, `clienteId`, `desde`, `hasta`, `q`, `orden`, `pagina`, `tamano`.
+* **Método:** `GET`
+* **Ruta:** `/api/tickets`
+* **Parámetros de consulta (Query):**
+  * `estado`: Filtra por estado (`Abierto`, `EnProceso`, `Resuelto`, `Cerrado`).
+  * `prioridad`: Filtra por prioridad (`Baja`, `Media`, `Alta`, `Critica`).
+  * `clienteId`: Identificador del cliente (entero).
+  * `desde` / `hasta`: Rango de fechas de creación (`YYYY-MM-DD`).
+  * `q`: Búsqueda por texto en título o descripción.
+  * `orden`: Criterio de ordenamiento (ej. `-fecha` para descendente).
+  * `pagina`: Número de página (por defecto `1`).
+  * `tamano`: Cantidad de registros por página (por defecto `10`).
 
-### 2. Crear un Ticket
-* **POST** `/api/tickets`
-* **Body de Ejemplo (JSON)**:
+---
+
+### 2. Obtener Ticket por ID
+* **Método:** `GET`
+* **Ruta:** `/api/tickets/{id}`
+* **Descripción:** Devuelve un ticket específico. Soporta encabezado `ETag` (`If-None-Match`) devolviendo un estado `304 Not Modified` si los datos no han cambiado.
+
+---
+
+### 3. Obtener Ticket por Código
+* **Método:** `GET`
+* **Ruta:** `/api/tickets/codigo/{codigo}`
+* **Descripción:** Busca por el código único del ticket. Aplica la restricción de ruta personalizada `ticketcode` (`TK-AAAA-NNNN`). Si el formato no coincide, la ruta devuelve `404 Not Found`.
+
+---
+
+### 4. Crear un Ticket
+* **Método:** `POST`
+* **Ruta:** `/api/tickets`
+* **Cuerpo de la petición (JSON):**
   ```json
   {
     "codigo": "TK-2026-0001",
