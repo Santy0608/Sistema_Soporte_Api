@@ -14,6 +14,8 @@ namespace API.Controllers
 
         private readonly ITicketFlujo _ticketFlujo;
 
+
+        //Constructor de la clase TicketsController
         public TicketsController(ITicketFlujo ticketFlujo) => _ticketFlujo = ticketFlujo;
 
         [HttpGet]
@@ -43,13 +45,37 @@ namespace API.Controllers
             return Ok(items);
         }
 
+
+        //Actualizando metodo de Obtener Ticket por Id
         [HttpGet("{id}")]
         public ActionResult<Ticket> Obtener(int id)
         {
-            Ticket ticket = _ticketFlujo.ObtenerPorId(id);
-            if (ticket == null) return NotFound();
+            var ticket = _ticketFlujo.ObtenerPorId(id);
+            if (ticket == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Status = StatusCodes.Status404NotFound,
+                    Title = "Ticket no encontrado",
+                    Detail = $"No existe un ticket registrado con el ID {id}."
+                });
+            }
+
+            // Cálculo del ETag (ejemplo basado en Hash / Fecha)
+            string etag = $"\"{ticket.Id}-{ticket.FechaActualizacion.Ticks}\"";
+
+            if (Request.Headers.TryGetValue("If-None-Match", out var clientETag) && clientETag == etag)
+            {
+                return StatusCode(StatusCodes.Status304NotModified);
+            }
+
+            Response.Headers.ETag = etag;
             return Ok(ticket);
         }
+
+
+
+
 
 
         [HttpPost]
@@ -63,7 +89,16 @@ namespace API.Controllers
         public IActionResult ObtenerPorCodigo(string codigo)
         {
             var ticket = _ticketFlujo.ObtenerPorCodigo(codigo);
-            if (ticket == null) return NotFound();
+            if (ticket == null)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Status = StatusCodes.Status404NotFound,
+                    Title = "Ticket no encontrado",
+                    Detail = $"No se encontró ningún ticket con el código '{codigo}'."
+                });
+            }
+
             return Ok(ticket);
         }
 
