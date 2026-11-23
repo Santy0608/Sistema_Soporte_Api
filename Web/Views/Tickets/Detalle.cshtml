@@ -1,0 +1,60 @@
+@model TicketVm
+@{
+    ViewData["Title"] = Model.Codigo;
+}
+
+<a asp-action="Index" class="btn btn-sm btn-outline-secondary mb-3">Volver a la lista</a>
+
+<div class="card">
+    <div class="card-body">
+        <h1 class="h4">@Model.Codigo: @Model.Titulo</h1>
+        <p class="mb-3">
+            <partial name="_InsigniaEstado" model="Model.Estado" />
+            <partial name="_InsigniaPrioridad" model="Model.Prioridad" />
+        </p>
+
+        <p>@Model.Descripcion</p>
+
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Cliente</dt>
+            <dd class="col-sm-9">@(Model.ClienteNombre ?? "Sin cliente")</dd>
+
+            <dt class="col-sm-3">Agente asignado</dt>
+            <dd class="col-sm-9">@(Model.AgenteId?.ToString() ?? "Sin asignar")</dd>
+
+            <dt class="col-sm-3">Reaperturas</dt>
+            <dd class="col-sm-9">@Model.Reaperturas</dd>
+
+            <dt class="col-sm-3">Creado</dt>
+            <dd class="col-sm-9">@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</dd>
+
+            <dt class="col-sm-3">Última actualización</dt>
+            <dd class="col-sm-9">@Model.FechaActualizacion.ToString("dd/MM/yyyy HH:mm")</dd>
+
+            <dt class="col-sm-3">Etiquetas</dt>
+            <dd class="col-sm-9">
+                @if (Model.Etiquetas.Count == 0)
+                {
+                    <span class="text-muted">Sin etiquetas</span>
+                }
+                else
+                {
+                    foreach (var etiqueta in Model.Etiquetas)
+                    {
+                        <span class="badge text-bg-light border me-1">@etiqueta</span>
+                    }
+                }
+            </dd>
+        </dl>
+
+        <form method="post" asp-action="CambiarEstado" asp-route-id="@Model.Id" class="d-flex gap-2 mt-3">
+            <select name="estado" class="form-select w-auto">
+                @foreach (var e in new[] { "Abierto", "EnProceso", "Resuelto", "Cerrado" })
+                {
+                    <option value="@e" selected="@(Model.Estado == e)">@e</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-outline-primary">Cambiar estado</button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+@model ErrorApiVm
+@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="alert alert-danger">
+    <h1 class="h5">@Model.Titulo</h1>
+    <p class="mb-1">@Model.Detalle</p>
+    @if (Model.Codigo.HasValue)
+    {
+        <p class="mb-0 small">Código HTTP devuelto por el API: @Model.Codigo</p>
+    }
+</div>
+
+<a asp-action="Index" class="btn btn-outline-secondary">Reintentar</a>

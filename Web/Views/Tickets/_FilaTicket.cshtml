@@ -1,0 +1,16 @@
+@model TicketVm
+@{
+    // Una vista parcial hereda el ViewData de la vista que la llama: aquí leemos la bandera que puso Index.
+    var mostrarCliente = (ViewData["MostrarCliente"] as bool?) ?? true;
+}
+<tr>
+    <td><a asp-action="Detalle" asp-route-id="@Model.Id">@Model.Codigo</a></td>
+    <td class="titulo-truncado">@Model.Titulo</td>
+    @if (mostrarCliente)
+    {
+        <td>@(Model.ClienteNombre ?? "Sin cliente")</td>
+    }
+    <td><partial name="_InsigniaPrioridad" model="Model.Prioridad" /></td>
+    <td><partial name="_InsigniaEstado" model="Model.Estado" /></td>
+    <td>@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</td>
+</tr>

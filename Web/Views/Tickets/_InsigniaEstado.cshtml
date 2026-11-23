@@ -1,0 +1,14 @@
+@model string
+@{
+    // Un switch de presentación (color según el estado) SÍ es lógica de vista aceptable:
+    // decide cómo SE VE el dato, no qué significa. Qué estado puede pasar a cuál es regla de negocio y vive en Flujo.
+    var color = Model switch
+    {
+        "Abierto" => "primary",
+        "EnProceso" => "warning text-dark",
+        "Resuelto" => "success",
+        "Cerrado" => "secondary",
+        _ => "light text-dark"
+    };
+}
+<span class="badge bg-@color">@Model</span>

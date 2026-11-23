@@ -1,0 +1,4 @@
+/* Estilos propios mínimos. Todo lo demás lo da Bootstrap. */
+body { background-color: #f8f9fa; }
+.tabla-tickets td { vertical-align: middle; }
+.titulo-truncado { max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

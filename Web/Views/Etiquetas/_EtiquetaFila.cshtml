@@ -1,0 +1,13 @@
+﻿@model EtiquetaVm
+
+<tr>
+    <td>@Model.Id</td>
+    <td>@Model.Nombre</td>
+    <td>
+        <span style="display:inline-block;width:14px;height:14px;background:@Model.Color;border-radius:3px;"></span>
+        @Model.Color
+    </td>
+    <td>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-info">Detalle</a>
+    </td>
+</tr>

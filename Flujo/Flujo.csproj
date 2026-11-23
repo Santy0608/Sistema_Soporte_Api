@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <!-- Solo para IServiceCollection (registro de DI). NO es ASP.NET Core. -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Permite que el proyecto de pruebas pruebe clases internal (como TicketCsv). -->
+    <InternalsVisibleTo Include="Pruebas" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Flujo conoce las INTERFACES (Abstracciones). NO referencia DA. -->
+    <ProjectReference Include="..\Abstracciones\Abstracciones.csproj" />
+  </ItemGroup>
+</Project>

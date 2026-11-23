@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-y-pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restaurar
+        run: dotnet restore
+
+      - name: Compilar el API
+        run: dotnet build --no-restore -c Release
+
+      - name: Pruebas
+        run: dotnet test --no-build -c Release --verbosity normal
+
+      # Semana 9: el MVC es otra solucion (Web/Web.slnx), por eso se compila aparte.
+      - name: Compilar el MVC
+        run: dotnet build Web/Web.slnx -c Release

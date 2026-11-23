@@ -1,0 +1,37 @@
+@model TicketCrearVm
+@{ ViewData["Title"] = "Nuevo ticket"; }
+
+<h1 class="h3 mb-3">Nuevo ticket</h1>
+
+<form method="post" asp-action="Crear">
+    @* Errores generales (los que no pertenecen a un campo), por ejemplo un 422 del API *@
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Titulo" class="form-label"></label>
+        <input asp-for="Titulo" class="form-control" />
+        <span asp-validation-for="Titulo" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Descripcion" class="form-label"></label>
+        <textarea asp-for="Descripcion" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Prioridad" class="form-label"></label>
+        <select asp-for="Prioridad" class="form-select">
+            <option>Baja</option>
+            <option>Media</option>
+            <option>Alta</option>
+            <option>Critica</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label asp-for="ClienteId" class="form-label">Cliente (Id)</label>
+        <input asp-for="ClienteId" class="form-control" />
+        <span asp-validation-for="ClienteId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+</form>

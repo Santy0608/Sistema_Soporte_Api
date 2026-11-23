@@ -1,0 +1,40 @@
+﻿@model List<EtiquetaVm>
+
+@{
+    ViewData["Title"] = "Etiquetas";
+}
+
+<h2>Etiquetas</h2>
+
+@if (TempData["MensajeExito"] is string mensajeExito)
+{
+    <div class="alert alert-success">@mensajeExito</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nueva etiqueta</a>
+</p>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">No hay etiquetas registradas.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Color</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var etiqueta in Model)
+            {
+                <partial name="_EtiquetaFila" model="etiqueta" />
+            }
+        </tbody>
+    </table>
+}

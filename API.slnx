@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Abstracciones/Abstracciones.csproj" />
+  <Project Path="DA/DA.csproj" />
+  <Project Path="Flujo/Flujo.csproj" />
+  <Project Path="API/API.csproj" />
+  <Project Path="Pruebas/Pruebas.csproj" />
+</Solution>

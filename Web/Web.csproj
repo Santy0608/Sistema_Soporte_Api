@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web"><!--
+    Fíjense en lo que NO hay aquí: ni una ProjectReference.
+    Este proyecto no conoce Abstracciones, DA ni Flujo. Solo habla con el API por HTTP.
+    (El net10.0, Nullable e ImplicitUsings vienen de Directory.Build.props en la raíz del repo.)
+  -->
+
+
+
+
+
+</Project>

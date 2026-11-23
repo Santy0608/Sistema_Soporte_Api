@@ -1,0 +1,9 @@
+<Project>
+  <!-- Configuración común de TODOS los proyectos. Así no se repite en cada .csproj. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+</Project>

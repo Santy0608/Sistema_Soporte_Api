@@ -1,0 +1,66 @@
+# EJEMPLO DE LECTURA. No se ejecuta: esta fuera de .github/workflows a proposito.
+#
+# El workflow REAL lo genera Azure: Web App > Centro de implementacion (Deployment Center) > GitHub.
+# Hagan eso en clase y comparen lo que Azure escriba con este archivo. Si las versiones de las
+# acciones (azure/login, azure/webapps-deploy) difieren de las de aqui, manda lo que genere el portal.
+#
+# Idea central: nada llega a Azure si las pruebas fallan (el job "desplegar" depende de "build-y-pruebas").
+
+name: CI y despliegue a Azure
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  id-token: write   # permite que GitHub emita un token temporal (OIDC) para entrar a Azure sin contrasena
+  contents: read
+
+jobs:
+  build-y-pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - run: dotnet restore
+      - run: dotnet build --no-restore -c Release
+      - run: dotnet test --no-build -c Release --verbosity normal
+
+      # Solo en main: se genera el paquete que se va a desplegar.
+      - name: Publicar el API
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: dotnet publish API/API.csproj -c Release -o publicado
+
+      - name: Guardar el paquete
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api
+          path: publicado
+
+  desplegar:
+    needs: build-y-pruebas
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: api
+          path: publicado
+
+      # Las tres credenciales viven en GitHub > Settings > Secrets. NUNCA en el repositorio.
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          package: publicado

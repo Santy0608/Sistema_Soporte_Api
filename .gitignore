@@ -1,0 +1,8 @@
+bin/
+obj/
+.vs/
+*.user
+appsettings.Development.json
+
+# Perfiles de publicación de Azure (traen el id de la suscripción y nombres de recursos)
+**/Properties/PublishProfiles/

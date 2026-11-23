@@ -1,0 +1,12 @@
+@model string
+@{
+    var color = Model switch
+    {
+        "Critica" => "danger",
+        "Alta" => "warning text-dark",
+        "Media" => "info text-dark",
+        "Baja" => "secondary",
+        _ => "light text-dark"
+    };
+}
+<span class="badge bg-@color">@Model</span>

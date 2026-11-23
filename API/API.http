@@ -1,0 +1,123 @@
+@host = http://localhost:5190
+
+### ===== CLIENTES =====
+### Listar con búsqueda y paginación (mirar los headers X-Total-Count, X-Page, X-Page-Size)
+GET {{host}}/api/clientes?q=ana&pagina=1&tamano=5
+
+### Obtener uno
+GET {{host}}/api/clientes/1
+
+### Crear (201). Repetir el mismo correo da 409. Teléfono inválido da 400.
+POST {{host}}/api/clientes
+Content-Type: application/json
+
+{ "nombre": "Ana Pérez", "correo": "ana.nueva@ejemplo.com", "telefono": "88889999", "empresa": "Empresa Ejemplo" }
+
+### Crear inválido (400 con el detalle de cada campo)
+POST {{host}}/api/clientes
+Content-Type: application/json
+
+{ "nombre": "A", "correo": "no-es-correo", "telefono": "123" }
+
+### Procedimiento almacenado
+GET {{host}}/api/clientes/buscar-sp?nombre=ana
+
+### ===== TICKETS =====
+### Lista con filtros, orden y paginación
+GET {{host}}/api/tickets?estado=Abierto&prioridad=Alta&orden=-prioridad&pagina=1&tamano=10
+
+### Parámetro inválido (400)
+GET {{host}}/api/tickets?estado=Inventado&tamano=999
+
+### Por id (mirar el header ETag)
+GET {{host}}/api/tickets/1
+
+### Con If-None-Match igual al ETag recibido responde 304
+GET {{host}}/api/tickets/1
+If-None-Match: W/"1-REEMPLAZAR-CON-EL-VALOR-REAL"
+
+### Por código (el formato se valida en la RUTA: uno malo da 404 sin llegar al método)
+GET {{host}}/api/tickets/codigo/TK-2026-0001
+
+### Crear
+POST {{host}}/api/tickets
+Content-Type: application/json
+
+{ "titulo": "No funciona el correo", "descripcion": "Desde ayer no sincroniza el correo.", "prioridad": "Alta", "clienteId": 1 }
+
+### Cliente inexistente (422)
+POST {{host}}/api/tickets
+Content-Type: application/json
+
+{ "titulo": "Prueba", "descripcion": "Cliente que no existe.", "prioridad": "Baja", "clienteId": 9999 }
+
+### Cambiar estado (200). Una transición inválida da 409.
+PATCH {{host}}/api/tickets/1/estado
+Content-Type: application/json
+
+{ "estado": "EnProceso", "agenteId": 2 }
+
+### Exportar CSV
+GET {{host}}/api/tickets/exportar?estado=Abierto
+
+### ===== ETIQUETAS Y COMENTARIOS =====
+GET {{host}}/api/etiquetas
+
+###
+POST {{host}}/api/etiquetas
+Content-Type: application/json
+
+{ "nombre": "Urgente", "color": "#ff0000" }
+
+### Asignar etiqueta a un ticket (204; repetirla da 409)
+PUT {{host}}/api/tickets/1/etiquetas/1
+
+###
+GET {{host}}/api/tickets/1/comentarios
+
+###
+POST {{host}}/api/tickets/1/comentarios
+Content-Type: application/json
+
+{ "autor": "Soporte", "texto": "Estamos revisando su caso.", "esInterno": false }
+
+### ===== MINIMAL API =====
+GET {{host}}/min/tickets/resumen
+
+###
+POST {{host}}/min/tickets/1/reabrir
+
+###
+GET {{host}}/min/clientes/1
+
+### ===== SEGURIDAD =====
+### Login como Admin (devuelve el token). Cambie la password por la de Semilla:ClaveInicial.
+# @name loginAdmin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "correo": "admin@soporte.local", "password": "Soporte2026!" }
+
+### Login como Agente
+# @name loginAgente
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "correo": "agente@soporte.local", "password": "Soporte2026!" }
+
+### Password incorrecta: 401 con el mismo mensaje que un correo inexistente
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "correo": "admin@soporte.local", "password": "incorrecta" }
+
+### Con Seguridad:Exigir = true, sin token: 401
+GET {{host}}/api/tickets
+
+### Con token: 200
+GET {{host}}/api/tickets
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### Borrar cliente con token de Agente: 403. Con el de Admin: 204 (o 404/409 según el cliente).
+DELETE {{host}}/api/clientes/1
+Authorization: Bearer {{loginAgente.response.body.$.token}}

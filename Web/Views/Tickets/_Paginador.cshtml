@@ -1,0 +1,24 @@
+@model ListaTicketsVm
+@* Solo se pinta si hay más de una página. Los asp-route-* conservan el filtro al cambiar de página. *@
+@if (Model.TotalPaginas > 1)
+{
+    <nav aria-label="Paginación de tickets">
+        <ul class="pagination">
+            <li class="page-item @(Model.HayAnterior ? "" : "disabled")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-pagina="@(Model.Pagina - 1)"
+                   asp-route-estado="@Model.Estado"
+                   asp-route-q="@Model.Q">Anterior</a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">Página @Model.Pagina de @Model.TotalPaginas</span>
+            </li>
+            <li class="page-item @(Model.HaySiguiente ? "" : "disabled")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-pagina="@(Model.Pagina + 1)"
+                   asp-route-estado="@Model.Estado"
+                   asp-route-q="@Model.Q">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+}

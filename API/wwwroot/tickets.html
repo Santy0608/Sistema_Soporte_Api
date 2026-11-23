@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tickets</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem auto; max-width: 960px; padding: 0 1rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border-bottom: 1px solid #ddd; padding: .4rem .6rem; text-align: left; }
+    th { background: #f4f4f4; }
+    .barra { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+    #estado { color: #555; margin-top: .5rem; }
+  </style>
+</head>
+<body>
+  <h1>Tickets</h1>
+
+  <div class="barra">
+    <label>Estado
+      <select id="filtroEstado">
+        <option value="">(todos)</option>
+        <option>Abierto</option><option>EnProceso</option><option>Resuelto</option><option>Cerrado</option>
+      </select>
+    </label>
+    <label>Buscar <input id="filtroTexto" type="search" maxlength="100"></label>
+    <button id="btnBuscar">Buscar</button>
+    <a id="enlaceCsv" href="/api/tickets/exportar">Exportar CSV</a>
+  </div>
+
+  <p id="estado"></p>
+
+  <table>
+    <thead><tr><th>Código</th><th>Título</th><th>Prioridad</th><th>Estado</th><th>Cliente</th></tr></thead>
+    <tbody id="filas"></tbody>
+  </table>
+
+  <div class="barra" style="margin-top:1rem">
+    <button id="btnAnterior">Anterior</button>
+    <span id="paginacion"></span>
+    <button id="btnSiguiente">Siguiente</button>
+  </div>
+
+<script>
+  const tamano = 10;
+  let pagina = 1;
+  let total = 0;
+
+  const $ = id => document.getElementById(id);
+
+  async function cargar() {
+    const params = new URLSearchParams({ pagina, tamano });
+    if ($('filtroEstado').value) params.set('estado', $('filtroEstado').value);
+    if ($('filtroTexto').value.trim()) params.set('q', $('filtroTexto').value.trim());
+
+    $('estado').textContent = 'Cargando...';
+    try {
+      const resp = await fetch('/api/tickets?' + params);
+      if (!resp.ok) {
+        const problema = await resp.json().catch(() => ({}));
+        $('estado').textContent = 'Error ' + resp.status + ': ' + (problema.title ?? 'no se pudo cargar');
+        return;
+      }
+      total = parseInt(resp.headers.get('X-Total-Count') ?? '0', 10);
+      const tickets = await resp.json();
+
+      const cuerpo = $('filas');
+      cuerpo.replaceChildren();
+      for (const t of tickets) {
+        const fila = cuerpo.insertRow();
+        // textContent (nunca innerHTML) para que un título malicioso no ejecute código en la página.
+        [t.codigo, t.titulo, t.prioridad, t.estado, t.clienteNombre ?? t.clienteId]
+          .forEach(valor => { fila.insertCell().textContent = valor; });
+      }
+
+      const paginas = Math.max(1, Math.ceil(total / tamano));
+      $('paginacion').textContent = 'Página ' + pagina + ' de ' + paginas + ' (' + total + ' tickets)';
+      $('btnAnterior').disabled = pagina <= 1;
+      $('btnSiguiente').disabled = pagina >= paginas;
+      $('estado').textContent = '';
+    } catch (e) {
+      $('estado').textContent = 'No se pudo conectar con el API.';
+    }
+  }
+
+  $('btnBuscar').onclick = () => { pagina = 1; cargar(); };
+  $('btnAnterior').onclick = () => { if (pagina > 1) { pagina--; cargar(); } };
+  $('btnSiguiente').onclick = () => { pagina++; cargar(); };
+  cargar();
+</script>
+</body>
+</html>
